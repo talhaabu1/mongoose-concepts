@@ -13,10 +13,10 @@ const nameSchema = new Schema<StudentName>({
 });
 
 const guardianSchema = new Schema<Guardian>({
-  fatherName: { tupe: String, required: true },
-  motherName: { tupe: String, required: true },
-  fatherContactName: { tupe: String, required: true },
-  motherContactName: { tupe: String, required: true },
+  fatherName: { type: String, required: true },
+  motherName: { type: String, required: true },
+  fatherContactName: { type: String, required: true },
+  motherContactName: { type: String, required: true },
 });
 
 const studentSchema = new Schema<Student>({
@@ -37,4 +37,4 @@ const studentSchema = new Schema<Student>({
   isActive: { type: String, enum: ['active', 'block'], required: true },
 });
 
-const User = model<Student>('User', studentSchema);
+export const StudentModel = model<Student>('User', studentSchema);
