@@ -1,18 +1,21 @@
-export interface Guardian {
+import { Model } from 'mongoose';
+
+export interface TGuardian {
   fatherName: string;
   motherName: string;
   fatherContactName: string;
   motherContactName: string;
 }
 
-export interface StudentName {
+export interface TStudentName {
   firstName: string;
   lastName: string;
 }
 
-export interface Student {
+export interface TStudent {
   id: string;
-  name: StudentName;
+  password: string;
+  name: TStudentName;
   gender: 'male' | 'female';
   dateOfBirth: string;
   email: string;
@@ -22,8 +25,26 @@ export interface Student {
   presentAddress: string;
   permanentAddress?: string;
   monthlySalary: number;
-  guardian: Guardian;
+  guardian: TGuardian;
   interested?: boolean;
   profileImg?: string;
   isActive: 'active' | 'block';
+  isDeleted: boolean;
 }
+
+// for creating static
+export interface TStudentModel extends Model<TStudent> {
+  // eslint-disable-next-line no-unused-vars
+  isUserExits(id: string): Promise<TStudent | null>;
+}
+
+//? for creating instance
+// export type TStudentMethods = {
+//   isUserExits(id: string): Promise<TStudent | null>;
+// };
+
+// export type TStudentModel = Model<
+//   TStudent,
+//   Record<string, never>,
+//   TStudentMethods
+// >;

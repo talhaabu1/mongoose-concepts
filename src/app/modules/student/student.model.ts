@@ -1,40 +1,187 @@
 import { Schema, model } from 'mongoose';
-import { Guardian, Student, StudentName } from './student.interface';
+import {
+  TGuardian,
+  TStudent,
+  TStudentModel,
+  TStudentName,
+} from './student.interface';
+import validator from 'validator';
+import bcrypt from 'bcrypt';
+import config from '../../config';
 
-const nameSchema = new Schema<StudentName>({
+const nameSchema = new Schema<TStudentName>({
   firstName: {
     type: String,
-    required: true,
+    required: [true, 'First name is required.'],
+    trim: true,
+    maxlength: [10, 'First name lenth max 10 characters change please'],
+    validate: {
+      validator: function (value: string) {
+        const firstNameStr = value.charAt(0).toUpperCase() + value.slice(1);
+
+        return firstNameStr === value;
+      },
+      message: '{VALUE} is not a Capitalized name',
+    },
   },
   lastName: {
     type: String,
-    required: true,
+    required: [true, 'Last name is required.'],
+    validate: {
+      validator: (value: string) => validator.isAlpha(value),
+      message: '{VALUE} is not a valida name',
+    },
   },
 });
 
-const guardianSchema = new Schema<Guardian>({
-  fatherName: { type: String, required: true },
-  motherName: { type: String, required: true },
-  fatherContactName: { type: String, required: true },
-  motherContactName: { type: String, required: true },
+const guardianSchema = new Schema<TGuardian>({
+  fatherName: { type: String, required: [true, 'Father name is required.'] },
+  motherName: { type: String, required: [true, 'Mother name is required.'] },
+  fatherContactName: {
+    type: String,
+    required: [true, 'Father contact name is required.'],
+  },
+  motherContactName: {
+    type: String,
+    required: [true, 'Mother contact name is required.'],
+  },
 });
 
-const studentSchema = new Schema<Student>({
-  id: { type: String },
-  name: nameSchema,
-  gender: ['male', 'female'],
-  dateOfBirth: { type: String, required: true },
-  email: { type: String, required: true },
-  contactNO: { type: String, required: true },
-  emergencyContactNO: { type: String, required: true },
-  bloodGroup: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
-  presentAddress: { type: String, required: true },
-  permanentAddress: { type: String },
-  monthlySalary: { type: Number, required: true },
-  guardian: guardianSchema,
-  interested: Boolean,
-  profileImg: String,
-  isActive: { type: String, enum: ['active', 'block'], required: true },
+const studentSchema = new Schema<TStudent, TStudentModel>(
+  {
+    id: {
+      type: String,
+      required: [true, 'Student ID is required.'],
+      unique: true,
+    },
+    password: {
+      type: String,
+      required: [true, 'Password is required.'],
+      maxlength: 10,
+    },
+    name: {
+      type: nameSchema,
+      required: [true, 'Student name is required.'],
+    },
+    gender: {
+      type: String,
+      enum: ['male', 'female', 'other'],
+      required: [true, 'Gender is required.'],
+    },
+    dateOfBirth: {
+      type: String,
+      required: [true, 'Date of birth is required.'],
+    },
+    email: {
+      type: String,
+      required: [true, 'Email is required.'],
+      validate: {
+        validator: (value: string) => validator.isEmail(value),
+        message: '{VALUE} this emali is not a valid',
+      },
+    },
+    contactNO: {
+      type: String,
+      required: [true, 'Contact number is required.'],
+    },
+    emergencyContactNO: {
+      type: String,
+      required: [true, 'Emergency contact number is required.'],
+    },
+    bloodGroup: {
+      type: String,
+      enum: {
+        values: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+        message:
+          '{VALUE} is not a valid blood group. Please choose from A+, A-, B+, B-, AB+, AB-, O+, O-.',
+      },
+    },
+    presentAddress: {
+      type: String,
+      required: [true, 'Present address is required.'],
+    },
+    permanentAddress: { type: String },
+    monthlySalary: {
+      type: Number,
+      required: [true, 'Monthly salary is required.'],
+    },
+    guardian: {
+      type: guardianSchema,
+      required: [true, 'Guardian information is required.'],
+    },
+    interested: Boolean,
+    profileImg: String,
+    isActive: {
+      type: String,
+      enum: ['active', 'block'],
+      default: 'active',
+      required: [true, 'Status is required.'],
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  { toJSON: { virtuals: true } },
+);
+
+//? vartuial
+studentSchema.virtual('fullName').get(function () {
+  return `${this.name.firstName} ${this.name.lastName}`;
 });
 
-export const StudentModel = model<Student>('User', studentSchema);
+//? pre save  middleware/ hook
+studentSchema.pre('save', async function (next) {
+  // console.log(this, 'pre hook : we will save te data');
+
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
+  const user = this;
+
+  // hashing password and save into db
+
+  user.password = await bcrypt.hash(user.password, Number(config.bcrypt_salt));
+  next();
+});
+
+//? post save middleware/ hook
+studentSchema.post('save', function (doc, next) {
+  doc.password = '';
+  next();
+});
+
+//? creating a custom static mehtod
+studentSchema.statics.isUserExits = async function (id) {
+  const userExit = await StudentModel.findOne({ id });
+  return userExit;
+};
+
+//? qury middleware/ hook
+studentSchema.pre('find', function (next) {
+  // console.log(this);
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
+
+studentSchema.pre('findOne', function (next) {
+  // console.log(this);
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
+
+studentSchema.pre('aggregate', function (next) {
+  // console.log(this);
+  this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
+  // this.find({ isDeleted: { $ne: true } });
+  next();
+});
+
+//? creating a custom instance method
+// studentSchema.methods.isUserExits = async function (id) {
+//   const userExit = await StudentModel.findOne({ id });
+//   return userExit;
+// };
+
+export const StudentModel = model<TStudent, TStudentModel>(
+  'Student',
+  studentSchema,
+);

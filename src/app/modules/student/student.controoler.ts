@@ -7,8 +7,8 @@ const createStudent = async (req: Request, res: Response) => {
     const student = req.body.student;
     // controller service call function ⤵
     const result = await studentServices.createStudentIntoDB(student);
-    // controller service call function ⤴
 
+    // controller service call function ⤴
     // send response
     res.status(200).json({
       success: true,
@@ -16,7 +16,10 @@ const createStudent = async (req: Request, res: Response) => {
       data: result,
     });
   } catch (error) {
-    console.log(error);
+    res.status(500).json({
+      success: false,
+      message: (error as Error).message,
+    });
   }
 };
 // student  post controoler ⤴
@@ -31,8 +34,12 @@ const getAllStudents = async (req: Request, res: Response) => {
       message: 'Student get successfully',
       data: result,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.log(error);
+    res.status(200).json({
+      success: true,
+      message: error.message,
+    });
   }
 };
 // student get controller ⤴
@@ -52,8 +59,23 @@ const getSingleStudents = async (req: Request, res: Response) => {
 };
 // student get single controller ⤴
 
+// student delete single controller ⤵
+const deleteStudent = async (req: Request, res: Response) => {
+  try {
+    await studentServices.deleteStudentFromDB(req.params.id);
+    res.status(200).json({
+      success: true,
+      message: 'Student is deleted successfully',
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+// student get single controller ⤴
+
 export const studentControolers = {
   createStudent,
   getAllStudents,
   getSingleStudents,
+  deleteStudent,
 };
