@@ -1,4 +1,8 @@
 {
   "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.formatOnSave": true
+  "editor.formatOnSave": true,
+  "a-file-icon-vscode.folderColor": "#4b526d",
+  "a-file-icon-vscode.folderTheme": "none",
+  "a-file-icon-vscode.opacity": 0,
+  "a-file-icon-vscode.saturation": 0.7
 }

@@ -6,8 +6,6 @@ import {
   TStudentName,
 } from './student.interface';
 import validator from 'validator';
-import bcrypt from 'bcrypt';
-import config from '../../config';
 
 const nameSchema = new Schema<TStudentName>({
   firstName: {
@@ -54,10 +52,11 @@ const studentSchema = new Schema<TStudent, TStudentModel>(
       required: [true, 'Student ID is required.'],
       unique: true,
     },
-    password: {
-      type: String,
-      required: [true, 'Password is required.'],
-      maxlength: 10,
+    user: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      unique: true,
+      ref: 'User',
     },
     name: {
       type: nameSchema,
@@ -111,42 +110,17 @@ const studentSchema = new Schema<TStudent, TStudentModel>(
     },
     interested: Boolean,
     profileImg: String,
-    isActive: {
-      type: String,
-      enum: ['active', 'block'],
-      default: 'active',
-      required: [true, 'Status is required.'],
-    },
     isDeleted: {
       type: Boolean,
       default: false,
     },
   },
-  { toJSON: { virtuals: true } },
+  { toJSON: { virtuals: true }, versionKey: false },
 );
 
 //? vartuial
 studentSchema.virtual('fullName').get(function () {
   return `${this.name.firstName} ${this.name.lastName}`;
-});
-
-//? pre save  middleware/ hook
-studentSchema.pre('save', async function (next) {
-  // console.log(this, 'pre hook : we will save te data');
-
-  // eslint-disable-next-line @typescript-eslint/no-this-alias
-  const user = this;
-
-  // hashing password and save into db
-
-  user.password = await bcrypt.hash(user.password, Number(config.bcrypt_salt));
-  next();
-});
-
-//? post save middleware/ hook
-studentSchema.post('save', function (doc, next) {
-  doc.password = '';
-  next();
 });
 
 //? creating a custom static mehtod
