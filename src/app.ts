@@ -1,8 +1,8 @@
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
-import { studentRoutes } from './app/modules/student/student.route';
-import { userRoutes } from './app/modules/user/user.route';
-import globalErrorHandler from './app/middlwares/globalErrorHandler';
+import globalErrorHandler from './app/middlewares/globalErrorHandler';
+import notFound from './app/middlewares/notFound';
+import router from './app/routes/inex';
 const app: Application = express();
 
 //? user parsers call ⤵
@@ -11,13 +11,14 @@ app.use(cors());
 //? user parsers call ⤴
 
 //? application routes call ⤵
-app.use('/students', studentRoutes);
-app.use('/users', userRoutes);
+app.use('/api/v1', router);
 //? application routes call ⤴
 
 app.get('/', (req: Request, res: Response) => {
   res.send('WELCOME PAGE 🧮');
 });
+
+app.use(notFound);
 
 app.use(globalErrorHandler);
 

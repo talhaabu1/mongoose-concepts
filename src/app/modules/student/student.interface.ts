@@ -18,7 +18,7 @@ export interface TStudent {
   password: string;
   name: TStudentName;
   gender: 'male' | 'female';
-  dateOfBirth: string;
+  dateOfBirth: Date;
   email: string;
   contactNO: string;
   emergencyContactNO: string;

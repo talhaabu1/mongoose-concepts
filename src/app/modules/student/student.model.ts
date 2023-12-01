@@ -51,6 +51,7 @@ const studentSchema = new Schema<TStudent, TStudentModel>(
       type: String,
       required: [true, 'Student ID is required.'],
       unique: true,
+      index: true,
     },
     user: {
       type: Schema.Types.ObjectId,
@@ -68,7 +69,7 @@ const studentSchema = new Schema<TStudent, TStudentModel>(
       required: [true, 'Gender is required.'],
     },
     dateOfBirth: {
-      type: String,
+      type: Date,
       required: [true, 'Date of birth is required.'],
     },
     email: {

@@ -8,6 +8,8 @@ const userSchema = new Schema<TUser>(
     id: {
       type: String,
       required: true,
+      unique: true,
+      index: true,
     },
     password: {
       type: String,

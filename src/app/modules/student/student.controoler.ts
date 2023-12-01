@@ -1,61 +1,37 @@
-import { NextFunction, Request, Response } from 'express';
+import { RequestHandler } from 'express';
 import { studentServices } from './student.service';
+import catchAsync from '../../utils/catchAsync';
 
 // student get controller ⤵
-const getAllStudents = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const result = await studentServices.getAllStudentsFromDB();
-
-    res.status(200).json({
-      success: true,
-      message: 'Student get successfully',
-      data: result,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+const getAllStudents = catchAsync(async (req, res) => {
+  const result = await studentServices.getAllStudentsFromDB();
+  res.status(200).json({
+    success: true,
+    message: 'Student get successfully',
+    data: result,
+  });
+});
 // student get controller ⤴
 
 // student get single controller ⤵
-const getSingleStudents = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    const result = await studentServices.getSingleStudentFromDB(req.params.id);
-    res.status(200).json({
-      success: true,
-      message: 'Student get one successfully',
-      data: result,
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+const getSingleStudents: RequestHandler = catchAsync(async (req, res) => {
+  const result = await studentServices.getSingleStudentFromDB(req.params.id);
+  res.status(200).json({
+    success: true,
+    message: 'Student get one successfully',
+    data: result,
+  });
+});
 // student get single controller ⤴
 
 // student delete single controller ⤵
-const deleteStudent = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-) => {
-  try {
-    await studentServices.deleteStudentFromDB(req.params.id);
-    res.status(200).json({
-      success: true,
-      message: 'Student is deleted successfully',
-    });
-  } catch (error) {
-    next(error);
-  }
-};
+const deleteStudent: RequestHandler = catchAsync(async (req, res) => {
+  await studentServices.deleteStudentFromDB(req.params.id);
+  res.status(200).json({
+    success: true,
+    message: 'Student is deleted successfully',
+  });
+});
 // student get single controller ⤴
 
 export const studentControolers = {
