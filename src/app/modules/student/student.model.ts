@@ -6,6 +6,8 @@ import {
   TStudentName,
 } from './student.interface';
 import validator from 'validator';
+import AppError from '../../errors/appError';
+import httpStatus from 'http-status';
 
 const nameSchema = new Schema<TStudentName>({
   firstName: {
@@ -51,7 +53,6 @@ const studentSchema = new Schema<TStudent, TStudentModel>(
       type: String,
       required: [true, 'Student ID is required.'],
       unique: true,
-      index: true,
     },
     user: {
       type: Schema.Types.ObjectId,
@@ -111,6 +112,11 @@ const studentSchema = new Schema<TStudent, TStudentModel>(
     },
     interested: Boolean,
     profileImg: String,
+    admissionSemester: { type: Schema.Types.ObjectId, ref: 'AcdemicSemester' },
+    academicDepartment: {
+      type: Schema.Types.ObjectId,
+      ref: 'AcademicDepartment',
+    },
     isDeleted: {
       type: Boolean,
       default: false,
@@ -127,7 +133,7 @@ studentSchema.virtual('fullName').get(function () {
 //? creating a custom static mehtod
 studentSchema.statics.isUserExits = async function (id) {
   const userExit = await StudentModel.findOne({ id });
-  return userExit;
+  if (!userExit) throw new AppError(httpStatus.NOT_FOUND, 'User not found');
 };
 
 //? qury middleware/ hook

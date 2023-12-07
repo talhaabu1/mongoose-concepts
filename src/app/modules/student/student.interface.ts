@@ -29,6 +29,8 @@ export interface TStudent {
   guardian: TGuardian;
   interested?: boolean;
   profileImg?: string;
+  admissionSemester: Types.ObjectId;
+  academicDepartment: Types.ObjectId;
   isDeleted: boolean;
 }
 

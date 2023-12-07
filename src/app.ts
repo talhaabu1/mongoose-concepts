@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import express, { Application, Request, Response } from 'express';
 import cors from 'cors';
 import globalErrorHandler from './app/middlewares/globalErrorHandler';
@@ -14,9 +15,12 @@ app.use(cors());
 app.use('/api/v1', router);
 //? application routes call ⤴
 
-app.get('/', (req: Request, res: Response) => {
-  res.send('WELCOME PAGE 🧮');
-});
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const test = async (req: Request, res: Response) => {
+  Promise.reject();
+};
+
+app.get('/', test);
 
 app.use(notFound);
 

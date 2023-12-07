@@ -16,8 +16,8 @@ export type TAcdemiSemName = 'Autumn' | 'Summar' | 'Fall';
 export type TAcdemiSemCode = '01' | '02' | '03';
 
 export interface TAcademicSemseter {
-  naem: TAcademicSemseter;
-  year: Date;
+  name: TAcdemiSemName;
+  year: string;
   code: TAcdemiSemCode;
   startMonth: TMonths;
   endMonth: TMonths;

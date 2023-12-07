@@ -21,3 +21,9 @@ export const months: TMonths[] = [
 
 export const AcdemiSemName: TAcdemiSemName[] = ['Autumn', 'Summar', 'Fall'];
 export const AcdemiSemCode: TAcdemiSemCode[] = ['01', '02', '03'];
+
+export const academicSemesterNameCodeMapper = {
+  Autumn: '01',
+  Summar: '02',
+  Fall: '03',
+};

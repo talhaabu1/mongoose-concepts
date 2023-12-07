@@ -1,16 +1,16 @@
 import { userControllers } from './user.controller';
 import { validateRequest } from '../../middlewares/validRequest';
 import { Router } from 'express';
-import createStudentSchema from '../student/student.validation';
+import { createStudentVadSchema } from '../student/student.validation';
 
 const router: Router = Router();
 
 const endPointsRoutes = [
   {
-    path: '/create-user',
+    path: '/create-student',
     contFun: userControllers.createStudent,
     method: 'post',
-    middl: validateRequest(createStudentSchema),
+    middl: validateRequest(createStudentVadSchema),
   },
 ];
 
